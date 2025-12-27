@@ -1,0 +1,47 @@
+# === 编译产物 (Build Outputs) ===
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.aps
+*.o
+*.out
+*.app
+*.bin
+
+# === CMake 产生的中间文件 ===
+/build/
+/out/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# === Visual Studio 缓存与配置 ===
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.suo
+*.db
+*.opendb
+
+# === CLion / JetBrains 缓存 ===
+.idea/
+cmake-build-*/
+
+# === 编译器生成的静态/动态库 ===
+*.lib
+*.a
+*.dll
+*.so
+*.dylib
+
+# === 其他临时文件 ===
+*.log
+*.tmp
+.DS_Store (Mac)
+
+# 忽略所有 x64 文件夹 (不管在哪个层级)
+[Xx]64/
