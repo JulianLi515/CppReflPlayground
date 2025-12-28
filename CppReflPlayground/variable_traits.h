@@ -1,6 +1,6 @@
 #pragma once
 #include <type_traits>
-
+namespace my_reflect {
 namespace detail {
 	// 处理通用类型：变量类型，是否常量
 	template <typename T>
@@ -30,5 +30,5 @@ struct variable_traits<T ClassT::*>
 	static constexpr bool is_member = true;
 };
 
-
+}
 

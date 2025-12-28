@@ -1,6 +1,6 @@
 #include <string>
 #include <iostream>
-#include "field_traits.h"
+#include "reflect_core.h"
 
 int g_value = 3;
 
@@ -15,21 +15,34 @@ public:
 	static void f3(int a) {};
 };
 
+
 class Person {
 public:
 	Person(std::string n, int a) :name(n), age(a) {}
 	const std::string& getName() const { return name; }
 	void setName(const std::string& n) { name = n; }
 	int getAge() const { return age; }
-private:
 	int age;
 	std::string name;
 };
 
+BEGIN_REFLECT(Person)
+functions(
+	func(&Person::getName),
+	func(&Person::setName),
+	func(&Person::getAge)
+)
+fields(
+	var(&Person::name),
+	var(&Person::age)
+)
+END_REFLECT()
 
 
 
 int main() {
+	auto typeInfo = my_reflect::type_data<Person>();
+	std::cout << std::get<1>(typeInfo.functions)._name << std::endl;
 	/*auto FunPtr = &Foo;
 	auto ClassFunPtr = &Bar::f2;
 	using func_info = function_traits<decltype(FunPtr) > ;

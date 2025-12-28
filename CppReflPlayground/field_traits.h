@@ -1,7 +1,7 @@
 #pragma once
 #include "function_traits.h"
 #include "variable_traits.h"
-
+namespace my_reflect {
 namespace detail {
 
 	template<bool isFunc, typename T>
@@ -61,15 +61,24 @@ template <typename T>
 struct field_traits 
 	: detail::basic_field_traits<is_function_v<T>,T> {
 	// 左值匹配构造函数 (传入 auto a where auto a = &Class::method)
-	constexpr field_traits(const T& ptr) : _ptr(ptr) {}
+	constexpr field_traits(const T& ptr, std::string_view name) 
+		: _ptr(ptr), 
+			_name{name.substr(name.find_last_of(":") + 1)}
+	{}
 	// 右值匹配构造函数 (直接传入 &Class:method)
-	constexpr field_traits(T&& ptr): _ptr(ptr){}
+	constexpr field_traits(T&& ptr, std::string_view name)
+		: _ptr(ptr),
+		_name{ name.substr(name.find_last_of(":") + 1) }
+	{}
+	
 	T _ptr;
+	std::string_view _name;
 };
 
 // TODO: 不理解这里为什么decay好一点，需要高人指点
 // 强制类型推导为decay类型，防止传左值产生引用类型（将依赖外部左值生命周期）
 //template <typename T>
 //field_traits(T) -> field_traits<std::decay_t<T>>;
+}
 
 
