@@ -1,10 +1,11 @@
 #include <string>
 #include <iostream>
 #include "reflect_core.h"
+#include "reflect_utils.h"
 
-int g_value = 3;
+static int g_value = 3;
 
-bool Foo(int) {
+static bool foo(int) {
 	return false;
 }
 
@@ -12,25 +13,36 @@ class Bar {
 public:
 	int f1;
 	void f2(int a, double b){}
-	static void f3(int a) {};
+	static void f3(int a) {}
 };
 
 
 class Person {
 public:
-	Person(std::string n, int a) :name(n), age(a) {}
+	Person(const std::string& n, int a) :age(a), name(n) {}
 	const std::string& getName() const { return name; }
 	void setName(const std::string& n) { name = n; }
 	int getAge() const { return age; }
+	void speak (const std::string&, int duration) const{}
 	int age;
 	std::string name;
 };
 
+class Student : public Person {
+public:
+	Student(const std::string& n, int a, long id) : Person(n, a), studentID(id) {}
+	void setID(long id) { studentID = id;}
+	long getID() const { return studentID; }
+	long studentID;
+};
+
 BEGIN_REFLECT(Person)
+BASE_CLASSES()
 functions(
 	func(&Person::getName),
 	func(&Person::setName),
-	func(&Person::getAge)
+	func(&Person::getAge),
+	func(&Person::speak)
 )
 fields(
 	var(&Person::name),
@@ -38,11 +50,32 @@ fields(
 )
 END_REFLECT()
 
+BEGIN_REFLECT(Student)
+BASE_CLASSES(Person)
+functions(
+	func(&Student::getID),
+	func(&Student::setID)
+)
+fields(
+	var(&Student::studentID)
+)
+END_REFLECT()
+
 
 
 int main() {
 	auto typeInfo = my_reflect::type_data<Person>();
-	std::cout << std::get<1>(typeInfo.functions)._name << std::endl;
+	auto studentTypeInfo = my_reflect::type_data<Student>();
+	Student stu("Bob", 22, 654321L);
+	my_reflect::utils::print_all(stu);
+	auto s = &Student::getName;
+	typeInfo.fields;
+	using o = decltype(studentTypeInfo)::base_types;
+	auto f =  std::get<0>(studentTypeInfo.functions);
+	using e = decltype(f);
+	using n = e::class_type;// Should be person
+
+	std::cout << std::get<3>(typeInfo.functions).param_cout() << '\n';
 	/*auto FunPtr = &Foo;
 	auto ClassFunPtr = &Bar::f2;
 	using func_info = function_traits<decltype(FunPtr) > ;

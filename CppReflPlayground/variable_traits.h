@@ -2,7 +2,7 @@
 #include <type_traits>
 namespace my_reflect {
 namespace detail {
-	// 处理通用类型：变量类型，是否常量
+	// handle common variable traits : type, constness
 	template <typename T>
 	struct basic_variable_traits {
 		using type = T;
@@ -11,9 +11,9 @@ namespace detail {
 }
 
 template <typename T>
-struct variable_traits;
+struct variable_traits; // primary template
 
-// 处理全局变量，静态变量
+// partial specialization for global/static variables
 template <typename T>
 struct variable_traits<T*>
 	: detail::basic_variable_traits<T> {
@@ -21,7 +21,7 @@ struct variable_traits<T*>
 	static constexpr bool is_member = false;
 };
 
-// 处理成员变量
+// partial specialization for member variables
 template <typename ClassT, typename T>
 struct variable_traits<T ClassT::*>
 	: detail::basic_variable_traits<T> {

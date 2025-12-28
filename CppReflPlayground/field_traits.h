@@ -5,12 +5,12 @@ namespace my_reflect {
 namespace detail {
 
 	template<bool isFunc, typename T>
-	struct basic_field_traits;
+	struct basic_field_traits; // main template
 
-	// 偏特化，处理函数指针类型
+	// partial specialization for function pointer types
 	template<typename T>
 	struct basic_field_traits<true, T> : function_traits<T> {
-		// 透传 function_traits 的所有成员
+		// pass through all members of function_traits
 		using traits = function_traits<T>;
 
 		constexpr bool is_member() const {
@@ -28,12 +28,17 @@ namespace detail {
 		constexpr bool is_variable() const {
 			return false;
 		}
+
+		constexpr size_t param_cout() const
+		{
+			return std::tuple_size_v<typename traits::parameter_type>;
+		}
 	};
 
-	// 偏特化，处理变量指针类型
+	// partial specialization for variable pointer types
 	template<typename T>
 	struct basic_field_traits<false, T> : variable_traits<T> {
-		// 透传 variable_traits 的所有成员
+		// pass through all members of variable_traits
 		using traits = variable_traits<T>;
 	
 		constexpr bool is_member() const {
@@ -60,12 +65,17 @@ constexpr bool is_function_v = std::is_member_function_pointer_v<T> || std::is_f
 template <typename T>
 struct field_traits 
 	: detail::basic_field_traits<is_function_v<T>,T> {
-	// 左值匹配构造函数 (传入 auto a where auto a = &Class::method)
+	// lvalue constructor (e.g.
+	//	auto a = &Class::method;
+	//	auto field_traits f(a);
+	//	)
 	constexpr field_traits(const T& ptr, std::string_view name) 
 		: _ptr(ptr), 
 			_name{name.substr(name.find_last_of(":") + 1)}
 	{}
-	// 右值匹配构造函数 (直接传入 &Class:method)
+	// rvalue constructor (e.g.
+	//	auto field_traits f(&Class::method);
+	//	)
 	constexpr field_traits(T&& ptr, std::string_view name)
 		: _ptr(ptr),
 		_name{ name.substr(name.find_last_of(":") + 1) }
@@ -75,8 +85,7 @@ struct field_traits
 	std::string_view _name;
 };
 
-// TODO: 不理解这里为什么decay好一点，需要高人指点
-// 强制类型推导为decay类型，防止传左值产生引用类型（将依赖外部左值生命周期）
+// TODO: I don't know why it makes more sense to use decay here, I need someone with higher level
 //template <typename T>
 //field_traits(T) -> field_traits<std::decay_t<T>>;
 }

@@ -2,10 +2,17 @@
 #include "field_traits.h"
 namespace my_reflect {
 
+	// static_reflection core
     template<typename T>
-    struct TypeData; // 主模板定义
+	struct TypeData
+    {
+		using base_types = std::tuple<>; // default no base types
+    }; // main template, to be specialized by macros
 
     #define BEGIN_REFLECT(X) template <> struct my_reflect::TypeData<X> {
+
+	#define BASE_CLASSES(...)\
+		using base_types = std::tuple<__VA_ARGS__>;
 
     #define functions(...)\
         static constexpr auto functions = std::make_tuple(__VA_ARGS__);
@@ -21,7 +28,7 @@ namespace my_reflect {
 
     #define END_REFLECT() };
 
-    // 主接口，调用后生成类型信息类
+	// main interface to get type data
     template<typename T>
     constexpr auto type_data() {
         return TypeData<T>{};

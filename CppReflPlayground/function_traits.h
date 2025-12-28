@@ -2,7 +2,7 @@
 #include <tuple>
 namespace my_reflect {
 namespace detail {
-	// 处理一些通用类型：返回值类型和参数类型
+	// handle common function traits: return type, parameter types
 	template <typename T>
 	struct basic_function_traits;
 
@@ -16,7 +16,7 @@ namespace detail {
 template <typename T>
 struct function_traits;
 
-// 处理全局函数,静态函数
+// handle global, static functions
 template <typename RetT, typename... ParamT>
 struct function_traits<RetT(*)(ParamT...)>
 	: detail::basic_function_traits<RetT(ParamT...)> {
@@ -24,7 +24,7 @@ struct function_traits<RetT(*)(ParamT...)>
 	static constexpr bool is_const = false;
 };
 
-// 处理成员函数
+// handle member functions
 template <typename ClassT, typename RetT, typename... ParamT>
 struct function_traits<RetT(ClassT::*)(ParamT...)>
 	: detail::basic_function_traits<RetT(ParamT...)> {
@@ -33,7 +33,7 @@ struct function_traits<RetT(ClassT::*)(ParamT...)>
 	constexpr static bool is_const = false;
 };
 
-// 处理成员const 函数
+// handle const member functions
 template <typename ClassT, typename RetT, typename... ParamT>
 struct function_traits<RetT(ClassT::*)(ParamT...) const>
 	: detail::basic_function_traits<RetT(ParamT...)> {
