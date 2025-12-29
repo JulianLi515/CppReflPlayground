@@ -2,6 +2,7 @@
 #include <iostream>
 #include "reflect_core.h"
 #include "reflect_utils.h"
+#include "type_list.h"
 
 static int g_value = 3;
 
@@ -63,19 +64,23 @@ END_REFLECT()
 
 
 
-int main() {
-	auto typeInfo = my_reflect::type_data<Person>();
-	auto studentTypeInfo = my_reflect::type_data<Student>();
-	Student stu("Bob", 22, 654321L);
-	my_reflect::utils::print_all(stu);
-	auto s = &Student::getName;
-	typeInfo.fields;
-	using o = decltype(studentTypeInfo)::base_types;
-	auto f =  std::get<0>(studentTypeInfo.functions);
-	using e = decltype(f);
-	using n = e::class_type;// Should be person
 
-	std::cout << std::get<3>(typeInfo.functions).param_cout() << '\n';
+int main() {
+
+	using tt = my_reflect::type_list<int, double, char>;
+	// using ttt = my_reflect::get_t<tt, 6>;
+	// auto typeInfo = my_reflect::type_data<Person>();
+	// auto studentTypeInfo = my_reflect::type_data<Student>();
+	// Student stu("Bob", 22, 654321L);
+	// my_reflect::utils::print_all(stu);
+	// auto s = &Student::getName;
+	// typeInfo.fields;
+	// using o = decltype(studentTypeInfo)::base_types;
+	// auto f =  std::get<0>(studentTypeInfo.functions);
+	// using e = decltype(f);
+	// using n = e::class_type;// Should be person
+	//
+	// std::cout << std::get<3>(typeInfo.functions).param_cout() << '\n';
 	/*auto FunPtr = &Foo;
 	auto ClassFunPtr = &Bar::f2;
 	using func_info = function_traits<decltype(FunPtr) > ;

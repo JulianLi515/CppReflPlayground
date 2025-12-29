@@ -8,17 +8,9 @@ namespace my_reflect::utils {
     // forward print all
 	template <class T>
     void print_all(const T& obj);
+
 	namespace detail
 	{
-        // convert from tuple<T...> to tuple<T*...>
-        template<typename T>
-        struct to_ptr_tuple;
-
-        template<typename... Args>
-        struct to_ptr_tuple<std::tuple<Args...>>
-        {
-            using type = std::tuple<std::add_pointer_t<Args>...>;
-        };
 
         template<class Derived, class Tuple, std::size_t... I>
         void print_bases_impl(const Derived& obj, std::index_sequence<I...>) {
@@ -40,6 +32,7 @@ namespace my_reflect::utils {
 
 
     // The "Visit" pattern: Apply a function 'f' to every element in a tuple
+    // this limits to a class instance.
     template <typename Tuple, typename Function, size_t... Idx>
     void visitTuple_Impl(Tuple&& tuple, Function&& f, std::index_sequence<Idx...>) {
         // Unary right fold with comma operator: execute f for each element
@@ -68,7 +61,6 @@ namespace my_reflect::utils {
 		using BaseTypes = typename TypeData<T>::base_types;
 
         detail::print_bases<T, BaseTypes>(obj);
-
 		// 2. print current class's member variables
         auto data = type_data<T>();
         std::apply([&](auto&&... args) {
