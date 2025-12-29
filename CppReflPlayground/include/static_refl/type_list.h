@@ -1,7 +1,7 @@
 #pragma once
 #include <type_traits>
 
-namespace my_reflect
+namespace my_reflect::static_refl
 {
     /**
      * @brief A compile-time list of types.
@@ -362,9 +362,9 @@ namespace my_reflect
 	template <typename T>
 	using tuple_from_type_list_t = typename details::to_tuple<T>::type;
 
-} // namespace my_reflect
+} // namespace my_reflect::static_refl
 
-namespace my_reflect::test_type_list {
+namespace my_reflect::static_refl::test_type_list {
     // ===== Test helpers =====
     template <typename T>
     struct is_int
@@ -394,7 +394,7 @@ namespace my_reflect::test_type_list {
 	// simple testing, hover mouse on variables to see inferred types
     inline int Test_type_list()
     {
-        using namespace my_reflect;
+        using namespace my_reflect::static_refl;
         using L0 = type_list<>;
         using L1 = type_list<int>;
         using L3 = type_list<int, double, char>;

@@ -4,7 +4,7 @@
 #include <type_traits>
 #include "reflect_core.h"
 
-namespace my_reflect::utils {
+namespace my_reflect::static_refl::utils {
     // forward print all
 	template <class T>
     void print_all(const T& obj);
@@ -14,7 +14,7 @@ namespace my_reflect::utils {
 
         template<typename T, typename TL, std::size_t... I>
         void print_bases_impl(const T& obj, std::index_sequence<I...>) {
-            (print_all<my_reflect::get_t<TL, I>>(static_cast<const my_reflect::get_t<TL, I>&>(obj)), ...);
+            (print_all<my_reflect::static_refl::get_t<TL, I>>(static_cast<const my_reflect::static_refl::get_t<TL, I>&>(obj)), ...);
         }
 
         template<class T, class TL>

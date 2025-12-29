@@ -1,8 +1,8 @@
 #pragma once
 #include <type_traits>
-namespace my_reflect {
+namespace my_reflect::static_refl {
 namespace detail {
-	// handle common variable traits : type, constness
+	// handle common variable traits: type, constness
 	template <typename T>
 	struct basic_variable_traits {
 		using type = T;

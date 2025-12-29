@@ -1,8 +1,8 @@
 #include <string>
 #include <iostream>
-#include "reflect_core.h"
-#include "reflect_utils.h"
-#include "type_list.h"
+#include "../include/static_refl/reflect_core.h"
+#include "../include/static_refl/reflect_utils.h"
+#include "../include/static_refl/type_list.h"
 
 static int g_value = 3;
 
@@ -87,18 +87,18 @@ int main() {
 
 	// can be used with instance
 	Student stu("Bob", 22, 654321L);
-	my_reflect::utils::print_all(stu);
+	my_reflect::static_refl::utils::print_all(stu);
 
 	// can be used without constructing instance (compile time only)
-	using typeData = my_reflect::TypeData<Student>;
+	using typeData = my_reflect::static_refl::TypeData<Student>;
 	using function_types = typeData::function_types;
 
 
 
 
-	// constexpr auto sss = my_reflect::TypeData<Gay>::variables;
+	// constexpr auto sss = my_reflect::static_refl::TypeData<Gay>::variables;
 	// typeInfo.variables
-	// my_reflect::utils::print_all(stu);
+	// my_reflect::static_refl::utils::print_all(stu);
 	// auto s = &Student::getName;
 	// typeInfo.variables;
 	// using o = decltype(studentTypeInfo)::base_types;

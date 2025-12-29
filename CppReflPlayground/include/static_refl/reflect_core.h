@@ -25,10 +25,10 @@
  * @code
  * // runtime: operates on values -> requires an instance
  * Student stu("Bob", 22, 654321L);
- * my_reflect::utils::print_all(stu);
+ * my_reflect::static_refl::utils::print_all(stu);
  *
  * // compile-time: operates on metadata/types -> no instance required
- * using TD = my_reflect::TypeData<Student>;
+ * using TD = my_reflect::static_refl::TypeData<Student>;
  * using FnTypes = TD::function_types;   // type_list<...> (traits or signatures)
  * @endcode
  *
@@ -36,7 +36,7 @@
  * - Accessing nested aliases (e.g. TD::function_types) triggers template instantiation of TypeData<T>,
  *   but does not require constructing an instance of T.
  */
-namespace my_reflect {
+namespace my_reflect::static_refl {
 
 	// static_reflection core
     template<typename T>
@@ -45,7 +45,7 @@ namespace my_reflect {
 		using base_types = type_list<>; // default no base types
     }; // main template, to be specialized by macros
 
-    #define BEGIN_REFLECT(X) template <> struct my_reflect::TypeData<X> {
+    #define BEGIN_REFLECT(X) template <> struct my_reflect::static_refl::TypeData<X> {
 
 	#define BASE_CLASSES(...)\
 		using base_types = type_list<__VA_ARGS__>;
@@ -59,10 +59,10 @@ namespace my_reflect {
         using variable_types = type_list_from_tuple_t<decltype(variables)>;
 
     #define func(F)\
-        my_reflect::field_traits{ F, #F }
+        my_reflect::static_refl::field_traits{ F, #F }
 
     #define var(F)\
-        my_reflect::field_traits{ F, #F }
+        my_reflect::static_refl::field_traits{ F, #F }
 
     #define END_REFLECT() };
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "function_traits.h"
 #include "variable_traits.h"
-namespace my_reflect {
+namespace my_reflect::static_refl {
 namespace detail {
 
 	template<bool isFunc, typename T>

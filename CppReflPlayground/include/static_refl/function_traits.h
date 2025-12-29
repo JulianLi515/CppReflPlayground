@@ -1,6 +1,6 @@
 #pragma once
 #include "type_list.h"
-namespace my_reflect {
+namespace my_reflect::static_refl {
 namespace detail {
 	// handle common function traits: return type, parameter types
 	template <typename T>
