@@ -37,6 +37,14 @@ public:
 	long studentID;
 };
 
+class Gay : public Person
+{
+public:
+	Gay(const std::string& n, int a, bool b) : Person(n, a), is0(b) {}
+	void sing() {};
+	bool is0;
+};
+
 BEGIN_REFLECT(Person)
 BASE_CLASSES()
 functions(
@@ -45,7 +53,7 @@ functions(
 	func(&Person::getAge),
 	func(&Person::speak)
 )
-fields(
+variables(
 	var(&Person::name),
 	var(&Person::age)
 )
@@ -57,8 +65,18 @@ functions(
 	func(&Student::getID),
 	func(&Student::setID)
 )
-fields(
+variables(
 	var(&Student::studentID)
+)
+END_REFLECT()
+
+BEGIN_REFLECT(Gay)
+BASE_CLASSES(Person)
+functions(
+	func(&Gay::sing)
+)
+variables(
+	var(&Gay::is0)
 )
 END_REFLECT()
 
@@ -67,14 +85,22 @@ END_REFLECT()
 
 int main() {
 
-	using tt = my_reflect::type_list<int, double, char>;
-	// using ttt = my_reflect::get_t<tt, 6>;
-	// auto typeInfo = my_reflect::type_data<Person>();
-	// auto studentTypeInfo = my_reflect::type_data<Student>();
-	// Student stu("Bob", 22, 654321L);
+	// can be used with instance
+	Student stu("Bob", 22, 654321L);
+	my_reflect::utils::print_all(stu);
+
+	// can be used without constructing instance (compile time only)
+	using typeData = my_reflect::TypeData<Student>;
+	using function_types = typeData::function_types;
+
+
+
+
+	// constexpr auto sss = my_reflect::TypeData<Gay>::variables;
+	// typeInfo.variables
 	// my_reflect::utils::print_all(stu);
 	// auto s = &Student::getName;
-	// typeInfo.fields;
+	// typeInfo.variables;
 	// using o = decltype(studentTypeInfo)::base_types;
 	// auto f =  std::get<0>(studentTypeInfo.functions);
 	// using e = decltype(f);

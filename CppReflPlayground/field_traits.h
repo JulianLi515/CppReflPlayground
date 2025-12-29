@@ -13,25 +13,26 @@ namespace detail {
 		// pass through all members of function_traits
 		using traits = function_traits<T>;
 
-		constexpr bool is_member() const {
+
+		static constexpr bool is_member() {
 			return traits::is_member;
 		}
 
-		constexpr bool is_const() const {
+		static constexpr bool is_const() {
 			return traits::is_const;
 		}
 
-		constexpr bool is_function() const {
+		static bool is_function() {
 			return true;
 		}
 
-		constexpr bool is_variable() const {
+		static bool is_variable() {
 			return false;
 		}
 
-		constexpr size_t param_cout() const
+		static constexpr size_t param_cout()
 		{
-			return std::tuple_size_v<typename traits::parameter_type>;
+			return traits::parameter_count;
 		}
 	};
 
@@ -41,19 +42,19 @@ namespace detail {
 		// pass through all members of variable_traits
 		using traits = variable_traits<T>;
 	
-		constexpr bool is_member() const {
+		static constexpr bool is_member() {
 			return traits::is_member;
 		}
 
-		constexpr bool is_const() const {
+		static constexpr bool is_const() {
 			return traits::is_const;
 		}
 
-		constexpr bool is_function() const {
+		static constexpr bool is_function() {
 			return false;
 		}
 
-		constexpr bool is_variable() const {
+		static constexpr bool is_variable() {
 			return true;
 		}
 	};
@@ -65,29 +66,16 @@ constexpr bool is_function_v = std::is_member_function_pointer_v<T> || std::is_f
 template <typename T>
 struct field_traits 
 	: detail::basic_field_traits<is_function_v<T>,T> {
-	// lvalue constructor (e.g.
-	//	auto a = &Class::method;
-	//	auto field_traits f(a);
-	//	)
-	constexpr field_traits(const T& ptr, std::string_view name) 
-		: _ptr(ptr), 
-			_name{name.substr(name.find_last_of(":") + 1)}
-	{}
-	// rvalue constructor (e.g.
-	//	auto field_traits f(&Class::method);
-	//	)
-	constexpr field_traits(T&& ptr, std::string_view name)
-		: _ptr(ptr),
-		_name{ name.substr(name.find_last_of(":") + 1) }
-	{}
+	
+	// this is supposed to used in the macro only we just a one pass by value constructor.
+	constexpr field_traits(T ptr, std::string_view name)
+		: _ptr(ptr), _name{ name } {
+	}
 	
 	T _ptr;
 	std::string_view _name;
 };
 
-// TODO: I don't know why it makes more sense to use decay here, I need someone with higher level
-//template <typename T>
-//field_traits(T) -> field_traits<std::decay_t<T>>;
 }
 
 

@@ -1,5 +1,5 @@
 #pragma once
-#include <tuple>
+#include "type_list.h"
 namespace my_reflect {
 namespace detail {
 	// handle common function traits: return type, parameter types
@@ -9,7 +9,8 @@ namespace detail {
 	template <typename RetT, typename... ParamT>
 	struct basic_function_traits<RetT(ParamT...)> {
 		using return_type = RetT;
-		using parameter_type = std::tuple<ParamT...>;
+		using parameter_type = type_list<ParamT...>;
+		static constexpr size_t parameter_count = parameter_type::size;
 	};
 }
 

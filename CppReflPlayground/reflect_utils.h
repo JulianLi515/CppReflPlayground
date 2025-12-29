@@ -12,14 +12,14 @@ namespace my_reflect::utils {
 	namespace detail
 	{
 
-        template<class Derived, class Tuple, std::size_t... I>
-        void print_bases_impl(const Derived& obj, std::index_sequence<I...>) {
-            (print_all<std::tuple_element_t<I, Tuple>>(static_cast<const std::tuple_element_t<I, Tuple>&>(obj)), ...);
+        template<typename T, typename TL, std::size_t... I>
+        void print_bases_impl(const T& obj, std::index_sequence<I...>) {
+            (print_all<my_reflect::get_t<TL, I>>(static_cast<const my_reflect::get_t<TL, I>&>(obj)), ...);
         }
 
-        template<class Derived, class Tuple>
-        void print_bases(const Derived& obj) {
-            print_bases_impl<Derived, Tuple>(obj, std::make_index_sequence<std::tuple_size<Tuple>::value>{});
+        template<class T, class TL>
+        void print_bases(const T& obj) {
+            print_bases_impl<T, TL>(obj, std::make_index_sequence<TL::size>{});
         }
 	}
 
@@ -65,8 +65,8 @@ namespace my_reflect::utils {
         auto data = type_data<T>();
         std::apply([&](auto&&... args) {
             // unary fold right 
-            ((std::cout << "[Field] " << args._name << " = " << obj.*(args._ptr) << "\n"), ...);
-            }, data.fields);
+            ((std::cout << "[Var] " << args._name << " = " << obj.*(args._ptr) << "\n"), ...);
+            }, data.variables);
 
 		// 3. print current class's member functions
         std::apply([&](auto&&... args) {

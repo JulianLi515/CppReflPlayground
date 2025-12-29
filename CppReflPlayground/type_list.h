@@ -1,6 +1,5 @@
 #pragma once
 #include <type_traits>
-#include <cstddef>
 
 namespace my_reflect
 {
@@ -154,6 +153,26 @@ namespace my_reflect
             using rest_rev = typename reverse<type_list<Remains...>>::type;
             using type = typename push<rest_rev, T>::type; // push_back
         };
+
+        // build from tuple
+        template <typename>
+		struct from_tuple;
+
+        template <typename... Args>
+		struct from_tuple<std::tuple<Args...>>
+        {
+			using type = type_list<Args...>;
+        };
+
+        template <typename>
+        struct to_tuple;
+
+        template <typename... Args>
+		struct to_tuple<type_list<Args...>>
+		{
+			using type = std::tuple<Args...>;
+		};
+
     } // namespace details
 
     // ===== Public API (only *_t / *_v) =====
@@ -314,6 +333,35 @@ namespace my_reflect
      */
     template <typename T>
     using reverse_t = typename details::reverse<T>::type;
+
+    /**
+	 * @brief Build a type_list from a std::tuple.
+	 * 
+	 * @tparam T A std::tuple<...> or (const) reference to it.
+	 * 
+	 * Usage:
+	 * @code
+	 * auto tup = std::make_tuple(1, 2, 2.0, 'a');
+	 * using TL = my_reflect::type_list_from_tuple_t<decltype(tup)>; // type_list<int, int, double, char>
+	 * @endcode 
+     */
+    template <typename T>
+	using type_list_from_tuple_t = typename details::from_tuple<std::remove_cv_t<std::remove_reference_t<T>>>::type;
+
+    /**
+	 * @brief Build a std::tuple from a type_list.
+	 * 
+	 * @tparam T A my_reflect::type_list<...>
+	 * 
+	 * Usage:
+	 * @code
+	 * using myList = my_reflect::type_list<int, double, char>;
+	 * using Tup = my_reflect::tuple_from_type_list_t<myList>; // std::tuple<int, double, char>
+     * @endcode 
+     */
+	template <typename T>
+	using tuple_from_type_list_t = typename details::to_tuple<T>::type;
+
 } // namespace my_reflect
 
 namespace my_reflect::test_type_list {
@@ -343,6 +391,7 @@ namespace my_reflect::test_type_list {
         using type = T*;
     };
 
+	// simple testing, hover mouse on variables to see inferred types
     inline int Test_type_list()
     {
         using namespace my_reflect;
@@ -432,6 +481,18 @@ namespace my_reflect::test_type_list {
         using R3 = reverse_t<L3>; // expect: type_list<char, double, int>
         using R4 = reverse_t<L4>; // expect: type_list<float, char, double, int>
 
+		// ------------------------------------------------------------
+		// type_list_from_tuple_t<std::tuple<...>> -> type_list<...>
+		// ------------------------------------------------------------
+		auto tup = std::make_tuple(1, 2,  2.0, 'a');
+		auto& tupRef = tup;
+		using TL = type_list_from_tuple_t<decltype(tupRef)>; // expect: type_list<int, int, double, char>
+
+		// ------------------------------------------------------------
+		// tuple_from_type_list_t<type_list<...>> -> std::tuple<...>
+		// ------------------------------------------------------------
+		using myList = type_list<int, double, char>;
+		using Tup = tuple_from_type_list_t<myList>; // expect: std::tuple<int, double, char>
 
         return 0;
     }
