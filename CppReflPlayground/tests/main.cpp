@@ -3,6 +3,8 @@
 #include "../include/static_refl/reflect_core.h"
 #include "../include/static_refl/reflect_utils.h"
 #include "../include/static_refl/type_list.h"
+#include "../include/dynamic_refl/dynamic_reflect_core.h"
+
 
 static int g_value = 3;
 
@@ -24,6 +26,7 @@ public:
 	const std::string& getName() const { return name; }
 	void setName(const std::string& n) { name = n; }
 	int getAge() const { return age; }
+	Person* GetThis() { return this; }
 	void speak (const std::string&, int duration) const{}
 	int age;
 	std::string name;
@@ -81,17 +84,45 @@ variables(
 END_REFLECT()
 
 
-
+enum class Color { red, green, blue };
 
 int main() {
+	namespace dyn_ref = my_reflect::dynamic_refl;
+	namespace sta_ref = my_reflect::static_refl;
 
-	// can be used with instance
-	Student stu("Bob", 22, 654321L);
-	my_reflect::static_refl::utils::print_all(stu);
+	dyn_ref::Register<Person>()
+		.Register("Person")
+		.Add<decltype(&Person::getName)>("getName")
+		.Add<decltype(&Person::setName)>("setName")
+		.Add<decltype(&Person::getAge)>("getAge")
+		.Add<decltype(&Person::speak)>("speak")
+		.Add<decltype(&Person::GetThis)>("GetThis")
+		.Add<decltype(&Person::age)>("age")
+		.Add<decltype(&Person::name)>("name");
+	const my_reflect::dynamic_refl::Type* typeInfo = dyn_ref::GetType("Person");
 
-	// can be used without constructing instance (compile time only)
-	using typeData = my_reflect::static_refl::TypeData<Student>;
-	using function_types = typeData::function_types;
+	std::cout << typeInfo->GetName() << '\n';
+
+
+	// my_reflect::dynamic_refl::Register<Color>()
+	// 			.Register("Color")
+	// 			.Add("red", Color::red)
+	// 			.Add("green", Color::green)
+	// 			.Add("blue", Color::blue);
+	// const my_reflect::dynamic_refl::Type* typeInfo = my_reflect::dynamic_refl::GetType("Color");
+	// const my_reflect::dynamic_refl::Type* typeInfo2 = my_reflect::dynamic_refl::GetType<int>();
+	// const my_reflect::dynamic_refl::Enum* enumInfo = typeInfo->AsEnum();
+	// for (const auto& item: enumInfo->GetItems()) {
+	// 	std::cout << item.name_ << '\n';
+	// }
+	// std::cout << typeInfo->GetName() << '\n';
+	// // can be used with instance
+	// Student stu("Bob", 22, 654321L);
+	// my_reflect::static_refl::utils::print_all(stu);
+	//
+	// // can be used without constructing instance (compile time only)
+	// using typeData = my_reflect::static_refl::TypeData<Student>;
+	// using function_types = typeData::function_types;
 
 
 

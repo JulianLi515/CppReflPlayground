@@ -29,6 +29,8 @@ struct variable_traits<T ClassT::*>
 	using class_type = ClassT;
 	static constexpr bool is_member = true;
 };
-
+// for outside usage of variable traits alone
+template <typename T>
+using variable_traits_t = typename variable_traits<T>::type;
 }
 

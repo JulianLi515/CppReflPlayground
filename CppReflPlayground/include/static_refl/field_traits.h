@@ -69,11 +69,11 @@ struct field_traits
 	
 	// this is supposed to used in the macro only we just a one pass by value constructor.
 	constexpr field_traits(T ptr, std::string_view name)
-		: _ptr(ptr), _name{ name } {
+		: ptr_(ptr), name_{ name } {
 	}
 	
-	T _ptr;
-	std::string_view _name;
+	T ptr_;
+	std::string_view name_;
 };
 
 }

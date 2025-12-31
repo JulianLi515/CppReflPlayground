@@ -65,12 +65,12 @@ namespace my_reflect::static_refl::utils {
         auto data = type_data<T>();
         std::apply([&](auto&&... args) {
             // unary fold right 
-            ((std::cout << "[Var] " << args._name << " = " << obj.*(args._ptr) << "\n"), ...);
+            ((std::cout << "[Var] " << args.name_ << " = " << obj.*(args.ptr_) << "\n"), ...);
             }, data.variables);
 
 		// 3. print current class's member functions
         std::apply([&](auto&&... args) {
-            ((std::cout << "[Func]  " << args._name << " (params: " << args.param_cout() << ")\n"), ...);
+            ((std::cout << "[Func]  " << args.name_ << " (params: " << args.param_cout() << ")\n"), ...);
             }, data.functions);
     }
 }
