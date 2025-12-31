@@ -12,7 +12,7 @@ namespace my_reflect::dynamic_refl {
     class Type {
     public:
         enum class Kind {
-            Arithmetic, Enum, Class, Pointer, Void
+            Arithmetic, Enum, Class, Pointer, Vector, Map, Set, Void
         };
 
         virtual ~Type() = default;

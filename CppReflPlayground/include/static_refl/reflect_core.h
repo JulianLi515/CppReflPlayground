@@ -5,7 +5,7 @@
  * @brief Compile-time reflection metadata for a user-defined type T.
  *
  * TypeData<T> is the "static reflection" entry point of this library.
- * It stores type information (fields/functions lists, type-lists, etc.) as compile-time
+ * It stores type information (fields/functions/containers lists, type-lists, etc.) as compile-time
  * metadata, which can be queried WITHOUT constructing an instance of T.
  *
  * There are two usage modes:
@@ -23,13 +23,37 @@
  *
  * Example:
  * @code
+ * class Person {
+ * public:
+ *     int age;
+ *     std::string name;
+ *     std::vector<std::string> friends;
+ *     void speak();
+ * };
+ *
+ * BEGIN_REFLECT(Person)
+ * BASE_CLASSES()
+ * variables(
+ *     var(&Person::age),
+ *     var(&Person::name)
+ * )
+ * containers(
+ *     container(&Person::friends)
+ * )
+ * functions(
+ *     func(&Person::speak)
+ * )
+ * END_REFLECT()
+ *
  * // runtime: operates on values -> requires an instance
- * Student stu("Bob", 22, 654321L);
- * my_reflect::static_refl::utils::print_all(stu);
+ * Person person;
+ * my_reflect::static_refl::utils::print_all(person);
  *
  * // compile-time: operates on metadata/types -> no instance required
- * using TD = my_reflect::static_refl::TypeData<Student>;
- * using FnTypes = TD::function_types;   // type_list<...> (traits or signatures)
+ * using TD = my_reflect::static_refl::TypeData<Person>;
+ * using VarTypes = TD::variable_types;     // type_list of variables
+ * using ContTypes = TD::container_types;   // type_list of containers
+ * using FnTypes = TD::function_types;      // type_list of functions
  * @endcode
  *
  * Note:
@@ -58,10 +82,17 @@ namespace my_reflect::static_refl {
         static constexpr auto variables = std::make_tuple(__VA_ARGS__);\
         using variable_types = type_list_from_tuple_t<decltype(variables)>;
 
+    #define containers(...)\
+        static constexpr auto containers = std::make_tuple(__VA_ARGS__);\
+        using container_types = type_list_from_tuple_t<decltype(containers)>;
+
     #define func(F)\
         my_reflect::static_refl::field_traits{ F, #F }
 
     #define var(F)\
+        my_reflect::static_refl::field_traits{ F, #F }
+
+    #define container(F)\
         my_reflect::static_refl::field_traits{ F, #F }
 
     #define END_REFLECT() };

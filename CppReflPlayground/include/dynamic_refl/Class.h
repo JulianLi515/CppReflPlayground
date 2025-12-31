@@ -52,6 +52,13 @@ namespace my_reflect::dynamic_refl {
             return *this;
         }
 
+        template <typename U>
+        ClassFactory& AddBaseClass() {
+            static_assert(std::is_class_v<U>, "Base class must be a class type");
+            info_.baseClasses_.push_back(static_cast<const Class*>(GetType<U>()));
+            return *this;
+        }
+
         Class& GetInfo() { return info_; }
     private:
         Class info_;

@@ -178,6 +178,20 @@ namespace my_reflect::static_refl
     // ===== Public API (only *_t / *_v) =====
 
     /**
+     * @brief Get the size of a type_list.
+     *
+     * @tparam T A my_reflect::type_list<...>
+     *
+     * Usage:
+     * @code
+     * using L = my_reflect::type_list<int, double, char>;
+     * static_assert(my_reflect::size_v<L> == 3);
+     * @endcode
+     */
+    template <typename T>
+    constexpr std::size_t size_v = T::size;
+
+    /**
      * @brief Get the first type (head) of a type_list.
      *
      * @tparam T A my_reflect::type_list<...>
@@ -229,6 +243,22 @@ namespace my_reflect::static_refl
      */
     template <typename T>
     using tail_t = typename details::tail<T>::type;
+
+    /**
+     * @brief Alias for head_t (get the first type).
+     *
+     * @tparam T A my_reflect::type_list<...>
+     */
+    template <typename T>
+    using front_t = head_t<T>;
+
+    /**
+     * @brief Alias for tail_t (get the last type).
+     *
+     * @tparam T A my_reflect::type_list<...>
+     */
+    template <typename T>
+    using back_t = tail_t<T>;
 
     /**
      * @brief Concatenate two type_list into one.
