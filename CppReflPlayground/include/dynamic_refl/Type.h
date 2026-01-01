@@ -17,6 +17,7 @@ namespace my_reflect::dynamic_refl {
 
         virtual ~Type() = default;
         explicit Type(const std::string& name, Kind kind);
+        Type(Type&& other) noexcept;
 
         const std::string& GetName() const { return name_; }
         void SetName(const std::string& name) { name_ = name; }

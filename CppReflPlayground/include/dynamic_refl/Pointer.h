@@ -16,6 +16,8 @@ namespace my_reflect::dynamic_refl {
     public:
         Pointer();
         Pointer(const Type* pointedType);
+        Pointer(Pointer&& other) noexcept;
+
         const Type* pointedType_;
 
         template <typename T>

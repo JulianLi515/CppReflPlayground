@@ -271,7 +271,184 @@ void test_static_reflection() {
 	std::cout << "========== All Tests Completed ==========\n";
 }
 
+void test_dynamic_reflection() {
+	namespace dyn_ref = my_reflect::dynamic_refl;
+
+	std::cout << "\n\n========== Dynamic Reflection Test Suite ==========\n\n";
+
+	// Register std::string first to avoid "Unknown_Class"
+	dyn_ref::Register<std::string>()
+		.Register("std::string");
+
+	std::cout << "Registered std::string type\n\n";
+
+	// Test 1: Register enum type
+	std::cout << "Test 1: Enum Registration\n";
+	std::cout << "-------------------------\n";
+
+	dyn_ref::Register<Color>()
+		.Register("Color")
+		.Add("red", Color::red)
+		.Add("green", Color::green)
+		.Add("blue", Color::blue);
+
+	const dyn_ref::Type* colorType = dyn_ref::GetType("Color");
+	std::cout << "Registered enum type: " << colorType->GetName() << "\n";
+	std::cout << "Type kind: " << (int)colorType->GetKind() << " (1=Enum)\n";
+
+	const dyn_ref::Enum* colorEnum = colorType->AsEnum();
+	std::cout << "Enum values:\n";
+	for (const auto& item : colorEnum->GetItems()) {
+		std::cout << "  " << item.name_ << " = " << item.value_ << "\n";
+	}
+	std::cout << "\n";
+
+	// Test 2: Register Person class
+	std::cout << "Test 2: Class Registration - Person\n";
+	std::cout << "------------------------------------\n";
+
+	dyn_ref::Register<Person>()
+		.Register("Person")
+		.Add<decltype(&Person::getName)>("getName")
+		.Add<decltype(&Person::setName)>("setName")
+		.Add<decltype(&Person::getAge)>("getAge")
+		.Add<decltype(&Person::speak)>("speak")
+		.Add<decltype(&Person::name)>("name")
+		.Add<decltype(&Person::age)>("age")
+		.Add<decltype(&Person::friends)>("friends")
+		.Add<decltype(&Person::luckyNumbers)>("luckyNumbers")
+		.Add<decltype(&Person::scores)>("scores");
+
+	const dyn_ref::Type* personType = dyn_ref::GetType("Person");
+	std::cout << "Registered class: " << personType->GetName() << "\n";
+	std::cout << "Type kind: " << (int)personType->GetKind() << " (2=Class)\n";
+
+	const dyn_ref::Class* personClass = static_cast<const dyn_ref::Class*>(personType);
+	std::cout << "Member functions count: " << personClass->memberFunctions_.size() << "\n";
+	std::cout << "Member variables count: " << personClass->memberVariables_.size() << "\n";
+	std::cout << "Member containers count: " << personClass->memberContainers_.size() << "\n";
+	std::cout << "\n";
+
+	// Test 3: Inspect member functions
+	std::cout << "Test 3: Member Functions Inspection\n";
+	std::cout << "------------------------------------\n";
+
+	for (const auto& func : personClass->memberFunctions_) {
+		std::cout << "Function: " << func.name_ << "\n";
+		std::cout << "  Return type: " << func.retType_->GetName() << "\n";
+		std::cout << "  Parameters count: " << func.argTypes_.size() << "\n";
+		if (!func.argTypes_.empty()) {
+			std::cout << "  Parameter types: ";
+			for (const auto* paramType : func.argTypes_) {
+				std::cout << paramType->GetName() << " ";
+			}
+			std::cout << "\n";
+		}
+	}
+	std::cout << "\n";
+
+	// Test 4: Inspect member variables
+	std::cout << "Test 4: Member Variables Inspection\n";
+	std::cout << "------------------------------------\n";
+
+	for (const auto& var : personClass->memberVariables_) {
+		std::cout << "Variable: " << var.name_ << "\n";
+		std::cout << "  Type: " << var.type_->GetName() << "\n";
+	}
+	std::cout << "\n";
+
+	// Test 5: Inspect member containers
+	std::cout << "Test 5: Member Containers Inspection\n";
+	std::cout << "-------------------------------------\n";
+
+	for (const auto& container : personClass->memberContainers_) {
+		std::cout << "Container: " << container.name_ << "\n";
+		std::cout << "  Kind: " << (int)container.kind_ << " (0=Set, 1=Vector, 2=Map)\n";
+		std::cout << "  Value type: " << container.valueType_->GetName() << "\n";
+		if (container.keyType_ != nullptr) {
+			std::cout << "  Key type: " << container.keyType_->GetName() << "\n";
+		}
+	}
+	std::cout << "\n";
+
+	// Test 6: Register Student with base class
+	std::cout << "Test 6: Class Registration - Student with Base Class\n";
+	std::cout << "-----------------------------------------------------\n";
+
+	dyn_ref::Register<Student>()
+		.Register("Student")
+		.AddBaseClass<Person>()
+		.Add<decltype(&Student::getID)>("getID")
+		.Add<decltype(&Student::setID)>("setID")
+		.Add<decltype(&Student::studentID)>("studentID");
+
+	const dyn_ref::Type* studentType = dyn_ref::GetType("Student");
+	const dyn_ref::Class* studentClass = static_cast<const dyn_ref::Class*>(studentType);
+
+	std::cout << "Registered class: " << studentClass->GetName() << "\n";
+	std::cout << "Base classes count: " << studentClass->baseClasses_.size() << "\n";
+	if (!studentClass->baseClasses_.empty()) {
+		std::cout << "Base class: " << studentClass->baseClasses_[0]->GetName() << "\n";
+	}
+	std::cout << "Member functions count: " << studentClass->memberFunctions_.size() << "\n";
+	std::cout << "Member variables count: " << studentClass->memberVariables_.size() << "\n";
+	std::cout << "\n";
+
+	// Test 7: Query type by name
+	std::cout << "Test 7: Type Lookup by Name\n";
+	std::cout << "----------------------------\n";
+
+	dyn_ref::Type* foundPerson = dyn_ref::GetType("Person");
+	dyn_ref::Type* foundStudent = dyn_ref::GetType("Student");
+	dyn_ref::Type* foundColor = dyn_ref::GetType("Color");
+
+	std::cout << "Found 'Person': " << (foundPerson != nullptr ? foundPerson->GetName() : "Not found") << "\n";
+	std::cout << "Found 'Student': " << (foundStudent != nullptr ? foundStudent->GetName() : "Not found") << "\n";
+	std::cout << "Found 'Color': " << (foundColor != nullptr ? foundColor->GetName() : "Not found") << "\n";
+	std::cout << "\n";
+
+	// Test 8: Get all registered types
+	std::cout << "Test 8: All Registered Types\n";
+	std::cout << "-----------------------------\n";
+
+	const auto& allTypes = dyn_ref::GetAllTypes();
+	std::cout << "Total registered types: " << allTypes.size() << "\n";
+	std::cout << "Type names:\n";
+	for (const auto& [name, type] : allTypes) {
+		std::cout << "  " << name << " (Kind: " << (int)type->GetKind() << ")\n";
+	}
+	std::cout << "\n";
+
+	// Test 9: Pointer type
+	std::cout << "Test 9: Pointer Type\n";
+	std::cout << "--------------------\n";
+
+	const dyn_ref::Type* intPtrType = dyn_ref::GetType<int*>();
+	std::cout << "int* type name: " << intPtrType->GetName() << "\n";
+	std::cout << "Type kind: " << (int)intPtrType->GetKind() << " (3=Pointer)\n";
+
+	const dyn_ref::Pointer* ptrInfo = static_cast<const dyn_ref::Pointer*>(intPtrType);
+	std::cout << "Pointed type: " << ptrInfo->pointedType_->GetName() << "\n";
+	std::cout << "\n";
+
+	// Test 10: Arithmetic types
+	std::cout << "Test 10: Arithmetic Types\n";
+	std::cout << "-------------------------\n";
+
+	const dyn_ref::Type* intType = dyn_ref::GetType<int>();
+	const dyn_ref::Type* doubleType = dyn_ref::GetType<double>();
+	const dyn_ref::Type* boolType = dyn_ref::GetType<bool>();
+
+	std::cout << "int type: " << intType->GetName() << " (Kind: " << (int)intType->GetKind() << ")\n";
+	std::cout << "double type: " << doubleType->GetName() << " (Kind: " << (int)doubleType->GetKind() << ")\n";
+	std::cout << "bool type: " << boolType->GetName() << " (Kind: " << (int)boolType->GetKind() << ")\n";
+	std::cout << "\n";
+
+	std::cout << "========== All Dynamic Tests Completed ==========\n";
+}
+
 int main() {
 	test_static_reflection();
+	test_dynamic_reflection();
 	return 0;
 }

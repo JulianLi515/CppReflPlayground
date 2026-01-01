@@ -8,9 +8,7 @@ file(GLOB_RECURSE LIB_SOURCES
         "CppReflPlayground/src/*.cpp"
 )
 
-add_library(my_reflect STATIC ${LIB_SOURCES}
-        CppReflPlayground/src/dynamic_refl/Vector.cpp
-        CppReflPlayground/include/dynamic_refl/Vector.h)
+add_library(my_reflect STATIC ${LIB_SOURCES})
 
 target_include_directories(my_reflect PUBLIC CppReflPlayground/include)
 

@@ -11,4 +11,9 @@ namespace my_reflect::dynamic_refl {
     Pointer::Pointer(const Type *pointedType)
         :Type(pointedType->GetName() + "*", Kind::Pointer), pointedType_(pointedType){
     }
+
+    Pointer::Pointer(Pointer&& other) noexcept
+        : Type(std::move(other)), pointedType_(other.pointedType_) {
+        other.pointedType_ = nullptr;
+    }
 }

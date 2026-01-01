@@ -19,7 +19,10 @@ namespace my_reflect::dynamic_refl {
     public:
         std::string name_;
         const Type* retType_;
-        const std::vector<const Type*> argTypes_;
+        std::vector<const Type*> argTypes_;
+
+        MemberFunction(std::string name, const Type* retType, std::vector<const Type*> argTypes);
+        MemberFunction(MemberFunction&& other) noexcept;
 
         template <typename T>
         static MemberFunction Create(const std::string& name) {

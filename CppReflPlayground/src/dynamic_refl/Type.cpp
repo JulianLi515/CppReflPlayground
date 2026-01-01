@@ -10,6 +10,9 @@ namespace my_reflect::dynamic_refl {
 
     Type::Type(const std::string& name, Kind kind) : name_(name), kind_(kind) {}
 
+    Type::Type(Type&& other) noexcept
+        : name_(std::move(other.name_)), kind_(other.kind_) {}
+
     const Arithmetic* Type::AsArithmetic() const {
         return kind_ == Kind::Arithmetic ? static_cast<const Arithmetic*>(this) : nullptr;
     }

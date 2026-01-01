@@ -10,6 +10,8 @@
 #include "TypeRegistry.h"
 #include "MemberFunction.h"
 #include "MemberVariable.h"
+#include "MemberContainer.h"
+#include "static_refl/container_traits.h"
 
 namespace my_reflect::dynamic_refl {
 
@@ -21,9 +23,11 @@ namespace my_reflect::dynamic_refl {
         std::vector<const Class*> baseClasses_;
         std::vector<MemberFunction> memberFunctions_;
         std::vector<MemberVariable> memberVariables_;
+        std::vector<MemberContainer> memberContainers_;
 
         void AddVar(MemberVariable&& variable);
         void AddFunc(MemberFunction&& function);
+        void AddContainer(MemberContainer&& container);
 
     };
 
@@ -44,10 +48,10 @@ namespace my_reflect::dynamic_refl {
         ClassFactory& Add(const std::string& name) {
             if constexpr(std::is_member_function_pointer_v<U>) {
                 info_.AddFunc(MemberFunction::Create<U>(name));
+            }else if constexpr (static_refl::is_container_v<U>){
+                info_.AddContainer(MemberContainer::Create<U>(name));
             }else if constexpr (std::is_member_object_pointer_v<U>) {
                 info_.AddVar(MemberVariable::Create<U>(name));
-            }else {
-
             }
             return *this;
         }

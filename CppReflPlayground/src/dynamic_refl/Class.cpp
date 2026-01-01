@@ -21,4 +21,8 @@ namespace my_reflect::dynamic_refl {
     void Class::AddFunc(MemberFunction &&function) {
         memberFunctions_.emplace_back(std::move(function));
     }
+
+    void Class::AddContainer(MemberContainer &&container) {
+        memberContainers_.emplace_back(std::move(container));
+    }
 }
