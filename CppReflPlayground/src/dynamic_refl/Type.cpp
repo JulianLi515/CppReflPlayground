@@ -5,6 +5,7 @@
 #include "../../include/dynamic_refl/Type.h"
 #include "../../include/dynamic_refl/Arithmetic.h"
 #include "../../include/dynamic_refl/Enum.h"
+#include "../../include/dynamic_refl/Class.h"
 
 namespace my_reflect::dynamic_refl {
 
@@ -19,6 +20,10 @@ namespace my_reflect::dynamic_refl {
 
     const Enum* Type::AsEnum() const {
         return kind_ == Kind::Enum ? static_cast<const Enum*>(this) : nullptr;
+    }
+
+    const Class* Type::AsClass() const {
+        return kind_ == Kind::Class ? static_cast<const Class*>(this) : nullptr;
     }
 
 }

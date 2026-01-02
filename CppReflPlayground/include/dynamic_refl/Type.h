@@ -7,6 +7,7 @@
 namespace my_reflect::dynamic_refl {
     class Enum;
     class Arithmetic;
+    class Class;
 
 
     class Type {
@@ -25,6 +26,7 @@ namespace my_reflect::dynamic_refl {
 
         const Arithmetic* AsArithmetic() const;
         const Enum* AsEnum() const;
+        const Class* AsClass() const;
 
     protected:
         std::string name_;

@@ -15,6 +15,9 @@
 
 namespace my_reflect::dynamic_refl {
 
+    // Forward declare Any
+    class Any;
+
     class Class : public Type {
     public:
         Class();
@@ -28,6 +31,13 @@ namespace my_reflect::dynamic_refl {
         void AddVar(MemberVariable&& variable);
         void AddFunc(MemberFunction&& function);
         void AddContainer(MemberContainer&& container);
+
+        // ========== Any Support Methods ==========
+        Any GetMemberValue(Any& instance, const std::string& memberName) const;
+        bool SetMemberValue(Any& instance, const std::string& memberName, const Any& value) const;
+
+        // Find member function by name (for invoke support)
+        const MemberFunction* FindFunction(const std::string& name) const;
 
     };
 
@@ -45,13 +55,33 @@ namespace my_reflect::dynamic_refl {
         };
 
         template <typename U>
-        ClassFactory& Add(const std::string& name) {
+        ClassFactory& Add(const std::string& name, U ptr) {
             if constexpr(std::is_member_function_pointer_v<U>) {
-                info_.AddFunc(MemberFunction::Create<U>(name));
-            }else if constexpr (static_refl::is_container_v<U>){
-                info_.AddContainer(MemberContainer::Create<U>(name));
+                info_.AddFunc(MemberFunction::Create<U>(name, ptr));
             }else if constexpr (std::is_member_object_pointer_v<U>) {
-                info_.AddVar(MemberVariable::Create<U>(name));
+                // Extract member type from member pointer
+                using MemberType = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<T>().*std::declval<U>())>>;
+                if constexpr (static_refl::is_container_v<MemberType>) {
+                    info_.AddContainer(MemberContainer::Create<MemberType>(name));
+                } else {
+                    info_.AddVar(MemberVariable::Create<U>(name));
+                }
+            }
+            return *this;
+        }
+
+        // Overload for type-only (used for decltype)
+        template <typename U>
+        ClassFactory& Add(const std::string& name) {
+            // This overload is for backward compatibility and type deduction
+            // For member functions, user should provide the pointer
+            if constexpr (std::is_member_object_pointer_v<U>) {
+                using MemberType = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<T>().*std::declval<U>())>>;
+                if constexpr (static_refl::is_container_v<MemberType>) {
+                    info_.AddContainer(MemberContainer::Create<MemberType>(name));
+                } else {
+                    info_.AddVar(MemberVariable::Create<U>(name));
+                }
             }
             return *this;
         }

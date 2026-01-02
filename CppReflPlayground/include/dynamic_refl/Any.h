@@ -6,11 +6,17 @@
 
 #pragma once
 
-#include "dynamic_reflect_core.h"
+#include "Type.h"
 #include <cassert>
 #include <utility>
+#include <optional>
+#include <stdexcept>
 
 namespace my_reflect::dynamic_refl {
+
+// Forward declaration
+template <typename T>
+const Type* GetType();
 
 class Any final {
 public:
@@ -24,7 +30,7 @@ public:
 		void(*destroy)(Any&) = nullptr;
 	};
 
-	Type* typeInfo = nullptr;
+	const Type* typeInfo = nullptr;
 	void* payload = nullptr;
 	storage_type storageType = storage_type::Empty;
 	operations ops;
@@ -37,8 +43,16 @@ public:
 	~Any();
 
 	bool empty() const;
-	Type* type() const;
+	const Type* type() const;
 	storage_type storage() const;
+
+	// Invoke member function by name
+	template<typename... Args>
+	Any invoke(const std::string& funcName, Args&&... args);
+
+	// Invoke member function by index
+	template<typename... Args>
+	Any invoke(size_t funcIndex, Args&&... args);
 };
 
 template <typename T>
@@ -159,6 +173,28 @@ const T* any_cast(const Any& elem) {
 		return static_cast<const T*>(elem.payload);
 	}
 	return nullptr;
+}
+
+// ========== Layer 1: Generic Any Operations ==========
+
+template<typename T>
+bool any_set(Any& any, const T& value) {
+	if (any.storage() == Any::storage_type::ConstRef) {
+		throw std::runtime_error("Cannot modify const reference Any");
+	}
+	if (auto* ptr = any_cast<T>(any)) {
+		*ptr = value;
+		return true;
+	}
+	return false;
+}
+
+template<typename T>
+std::optional<T> any_get(const Any& any) {
+	if (const auto* ptr = any_cast<T>(any)) {
+		return *ptr;
+	}
+	return std::nullopt;
 }
 
 } // namespace my_reflect::dynamic_refl

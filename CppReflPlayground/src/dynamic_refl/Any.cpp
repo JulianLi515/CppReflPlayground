@@ -95,7 +95,7 @@ bool Any::empty() const {
 	return storageType == storage_type::Empty; 
 }
 
-Type* Any::type() const {
+const Type* Any::type() const {
 	return typeInfo; 
 }
 

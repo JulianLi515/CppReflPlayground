@@ -15,6 +15,7 @@
 #include <type_traits>
 
 #include "Class.h"
+#include "invoke_impl.h"  // Include invoke implementation for Any::invoke methods
 
 class TrivialFactory {
     public:

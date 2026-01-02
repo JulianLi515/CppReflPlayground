@@ -3,14 +3,17 @@
 //
 
 #include "../../include/dynamic_refl/MemberContainer.h"
+
 namespace my_reflect::dynamic_refl {
-    MemberContainer::MemberContainer(std::string name, static_refl::ContainerKind kind, const Type* valueType, const Type* keyType)
-        : name_(std::move(name)), valueType_(valueType), keyType_(keyType), kind_(kind)
+    MemberContainer::MemberContainer(std::string name, static_refl::ContainerKind kind,
+                                     const Type* valueType, const Type* keyType, ContainerOperations ops)
+        : name_(std::move(name)), valueType_(valueType), keyType_(keyType), kind_(kind), ops_(std::move(ops))
     {
     }
 
     MemberContainer::MemberContainer(MemberContainer&& other) noexcept
-        : name_(std::move(other.name_)), valueType_(other.valueType_), keyType_(other.keyType_), kind_(other.kind_)
+        : name_(std::move(other.name_)), valueType_(other.valueType_), keyType_(other.keyType_),
+          kind_(other.kind_), ops_(std::move(other.ops_))
     {
         other.valueType_ = nullptr;
         other.keyType_ = nullptr;
