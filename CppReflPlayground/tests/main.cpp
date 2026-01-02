@@ -1,9 +1,11 @@
+#include <cassert>
 #include <string>
 #include <iostream>
 #include "../include/static_refl/reflect_core.h"
 #include "../include/static_refl/reflect_utils.h"
 #include "../include/static_refl/type_list.h"
 #include "../include/dynamic_refl/dynamic_reflect_core.h"
+#include "../include/dynamic_refl/Any.h"
 
 
 static int g_value = 3;
@@ -446,6 +448,9 @@ void test_dynamic_reflection() {
 
 	std::cout << "========== All Dynamic Tests Completed ==========\n";
 }
+
+
+
 
 int main() {
 	test_static_reflection();
