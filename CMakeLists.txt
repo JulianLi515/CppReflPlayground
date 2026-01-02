@@ -17,3 +17,7 @@ add_executable(my_test CppReflPlayground/tests/main.cpp)
 target_link_libraries(my_test PRIVATE my_reflect)
 
 target_include_directories(my_test PRIVATE CppReflPlayground/include)
+
+add_executable(constexpr_demo CppReflPlayground/tests/constexpr_demo.cpp)
+
+target_include_directories(constexpr_demo PRIVATE CppReflPlayground/include)
